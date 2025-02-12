@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат с AI (DeepSeek) - KDB</title>
+    <style>
+        body { 
+            font-family: 'Noto Sans KR', sans-serif;
+            text-align: center; 
+            margin: 50px; 
+            background-color: #f4f6f9;
+            color: #333;
+        }
+        .chat-container {
+            max-width: 600px; 
+            margin: auto; 
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .logo {
+            width: 150px;
+            margin: 0 auto 20px auto;
+            display: block;
+        }
+        select, input, button {
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 5px;
+        }
+        input {
+            width: 80%;
+            border: 1px solid #0073e6;
+        }
+        button {
+            cursor: pointer;
+            background-color: #0073e6;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #005bb5;
+        }
+        #chat {
+            text-align: left;
+            padding: 10px;
+        }
+        .user { color: #0073e6; font-weight: bold; }
+        .ai { color: #2e7d32; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <img src="logo.png" alt="KDB Logo" class="logo">
+        <h2>KDB AI Chat</h2>
+        <label for="language">Выберите язык:</label>
+        <select id="language" onchange="updateButtonText()">
+            <option value="ru">Русский</option>
+            <option value="en">English</option>
+            <option value="uz">Oʻzbek</option>
+            <option value="zh">中文</option>
+        </select>
+        <div id="chat"></div>
+        <input type="text" id="question" placeholder="Введите вопрос" onkeypress="handleKeyPress(event)">
+        <button id="askButton" onclick="askAI()">Спросить</button>
+    </div>
+
+    <script>
+        function updateButtonText() {
+            let language = document.getElementById("language").value;
+            let button = document.getElementById("askButton");
+            let placeholder = document.getElementById("question");
+            
+            let translations = {
+                "ru": { button: "Спросить", placeholder: "Введите вопрос" },
+                "en": { button: "Ask", placeholder: "Enter your question" },
+                "uz": { button: "So‘rash", placeholder: "Savolingizni kiriting" },
+                "zh": { button: "询问", placeholder: "输入您的问题" }
+            };
+            
+            button.textContent = translations[language].button;
+            placeholder.placeholder = translations[language].placeholder;
+        }
+        
+        async function askAI() {
+            let questionInput = document.getElementById("question");
+            let question = questionInput.value.trim();
+            let language = document.getElementById("language").value;
+            if (!question) return;
+
+            let chatDiv = document.getElementById("chat");
+            chatDiv.innerHTML += `<p class='user'>Вы: ${question}</p>`;
+            questionInput.value = "";
+
+            let response = await fetch("http://127.0.0.1:5000/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question: question, language: language })
+            });
+
+            let data = await response.json();
+            chatDiv.innerHTML += `<p class='ai'>AI: ${data.answer}</p>`;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                askAI();
+            }
+        }
+    </script>
+</body>
+</html>
