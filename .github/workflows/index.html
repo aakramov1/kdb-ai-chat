@@ -3,17 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Чат с AI</title>
+    <title>Чат с AI (DeepSeek) - KDB</title>
+    <style>
+        body { 
+            font-family: 'Noto Sans KR', sans-serif;
+            text-align: center; 
+            margin: 50px; 
+            background-color: #f4f6f9;
+            color: #333;
+        }
+        .chat-container {
+            max-width: 600px; 
+            margin: auto; 
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 80%; 
+            padding: 12px;
+            margin: 10px 0; 
+            border: 1px solid #0073e6;
+            border-radius: 5px;
+        }
+        button {
+            padding: 12px 20px;
+            cursor: pointer;
+            background-color: #0073e6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #005bb5;
+        }
+        #chat {
+            text-align: left;
+            padding: 10px;
+        }
+        .user { color: #0073e6; font-weight: bold; }
+        .ai { color: #2e7d32; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <h2>Чат с AI (DeepSeek)</h2>
-    <input type="text" id="question" placeholder="Введите вопрос">
-    <button onclick="askAI()">Спросить</button>
-    <p id="answer"></p>
+    <div class="chat-container">
+        <img src="logo.png" alt="KDB Logo" class="logo">
+        <h2>KDB AI Chat</h2>
+        <p><strong>О банке:</strong> KDB Bank Uzbekistan – крупнейший международный банк в Узбекистане, специализирующийся на корпоративном и инвестиционном банкинге.</p>
+        <p><strong>Основной акционер:</strong> Korea Development Bank (Корея) – 86.32%</p>
+        <p><strong>Услуги банка:</strong> корпоративные счета, инвестиционные решения, международные платежи, валютные операции, кредитование бизнеса.</p>
+        <p><strong>Филиалы:</strong> Головной офис - 3, Bukharo Str., 100047 Ташкент | Филиал Oybek - 32, Oybek Str., 100015 Ташкент</p>
+        <p><strong>Контакты:</strong> Телефон: (+998 78) 120-80-00 | Email: info@kdb.uz | <a href="https://www.kdb.uz">www.kdb.uz</a></p>
+        <p><strong>Рабочие часы:</strong> Понедельник - Пятница, 9:00 - 17:00</p>
+        <div id="chat"></div>
+        <input type="text" id="question" placeholder="Введите вопрос" onkeypress="handleKeyPress(event)">
+        <button onclick="askAI()">Спросить</button>
+    </div>
 
     <script>
         async function askAI() {
-            let question = document.getElementById("question").value;
+            let questionInput = document.getElementById("question");
+            let question = questionInput.value.trim();
+            if (!question) return;
+
+            let chatDiv = document.getElementById("chat");
+            chatDiv.innerHTML += `<p class='user'>Вы: ${question}</p>`;
+            questionInput.value = "";
+
             let response = await fetch("http://127.0.0.1:5000/ask", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -21,7 +82,13 @@
             });
 
             let data = await response.json();
-            document.getElementById("answer").innerText = data.answer;
+            chatDiv.innerHTML += `<p class='ai'>AI: ${data.answer}</p>`;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                askAI();
+            }
         }
     </script>
 </body>
