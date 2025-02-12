@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат с AI</title>
+</head>
+<body>
+    <h2>Чат с AI (DeepSeek)</h2>
+    <input type="text" id="question" placeholder="Введите вопрос">
+    <button onclick="askAI()">Спросить</button>
+    <p id="answer"></p>
+
+    <script>
+        async function askAI() {
+            let question = document.getElementById("question").value;
+            let response = await fetch("http://127.0.0.1:5000/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question: question })
+            });
+
+            let data = await response.json();
+            document.getElementById("answer").innerText = data.answer;
+        }
+    </script>
+</body>
+</html>
